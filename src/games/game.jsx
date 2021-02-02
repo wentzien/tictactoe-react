@@ -4,6 +4,9 @@ import P5 from "../components/p5";
 
 class Game extends Component {
     state = {
+        player: "",
+        playerId: "",
+        opponentId: "",
         board: [
             [0, 0, 0],
             [0, 0, 0],
@@ -11,7 +14,7 @@ class Game extends Component {
         ],
         aScore: 0,
         bScore: 0,
-        gameStatus: "bTurn"
+        gameStatus: "pending",
     };
 
     socket;
@@ -23,9 +26,16 @@ class Game extends Component {
         this.socket = io(this.urlApi);
 
         const {gameId, playerId} = this.props.match.params;
+        this.setState({gameId, playerId})
 
         this.socket.emit("join", {gameId, playerId}, (answer) => {
             console.log(answer);
+        });
+
+        this.socket.on("gameData", (gameData) => {
+            let {board, aScore, bScore, gameStatus, player} = gameData;
+            board = JSON.parse(board);
+            this.setState({board, aScore, bScore, gameStatus, player});
         });
     }
 
@@ -37,7 +47,6 @@ class Game extends Component {
     sketch = (p5) => {
         let xArea, yArea;
         const SPACE = 5;
-        const {board} = this.state;
 
         p5.setup = () => {
             let size = p5.min(p5.windowHeight - 100, p5.windowWidth - 100);
@@ -49,6 +58,8 @@ class Game extends Component {
         };
 
         p5.draw = () => {
+            const {board} = this.state;
+
             function drawBoard() {
                 p5.strokeWeight(1);
 
@@ -62,8 +73,8 @@ class Game extends Component {
             function drawAllSymbols() {
                 for (let y = 0; y < 3; y++) {
                     for (let x = 0; x < 3; x++) {
-                        if (board[y][x] === "X") drawSymbolX(y, x);
-                        if (board[y][x] === "O") drawSymbolO(y, x);
+                        if (board[y][x] === "a") drawSymbolX(y, x);
+                        if (board[y][x] === "b") drawSymbolO(y, x);
                     }
                 }
             }
@@ -84,7 +95,26 @@ class Game extends Component {
             drawBoard();
             drawAllSymbols();
         };
+
+        p5.mousePressed = () => {
+            let x = Math.floor(p5.mouseX / xArea);
+            let y = Math.floor(p5.mouseY / yArea);
+            if(x < 3 && y < 3) {
+                this.updateBoard(x, y);
+                p5.redraw();
+            }
+        }
     };
+
+    updateBoard = (x, y) => {
+        const {player, gameStatus} = this.state;
+        if((player === "a" && gameStatus === "aTurn") || (player === "b" && gameStatus === "bTurn")) {
+            let board = [...this.state.board];
+            board[y][x] = player;
+            this.setState({board, gameStatus: "pending"});
+        }
+    };
+
 
     render() {
         return (

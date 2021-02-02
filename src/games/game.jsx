@@ -29,14 +29,15 @@ class Game extends Component {
         this.setState({gameId, playerId})
 
         this.socket.emit("join", {gameId, playerId}, (answer) => {
-            console.log(answer);
+            const {player} = answer;
+            this.setState({player})
         });
 
         this.socket.on("gameData", (gameData) => {
-            let {board, aScore, bScore, gameStatus, player} = gameData;
-            board = JSON.parse(board);
-            this.setState({board, aScore, bScore, gameStatus, player});
+            const {board, aScore, bScore, gameStatus} = gameData;
+            this.setState({board, aScore, bScore, gameStatus});
         });
+
     }
 
     componentWillUnmount() {
@@ -54,7 +55,7 @@ class Game extends Component {
             xArea = p5.width / 3;
             yArea = p5.height / 3;
             // resetGame();
-            p5.noLoop();
+            // p5.noLoop();
         };
 
         p5.draw = () => {
@@ -107,10 +108,15 @@ class Game extends Component {
     };
 
     updateBoard = (x, y) => {
-        const {player, gameStatus} = this.state;
+        const {player, gameStatus, gameId} = this.state;
         if((player === "a" && gameStatus === "aTurn") || (player === "b" && gameStatus === "bTurn")) {
             let board = [...this.state.board];
             board[y][x] = player;
+            let gameData = {
+                board,
+                gameId
+            };
+            this.socket.emit("gameProgress", gameData)
             this.setState({board, gameStatus: "pending"});
         }
     };

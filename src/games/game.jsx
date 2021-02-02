@@ -111,13 +111,15 @@ class Game extends Component {
         const {player, gameStatus, gameId} = this.state;
         if((player === "a" && gameStatus === "aTurn") || (player === "b" && gameStatus === "bTurn")) {
             let board = [...this.state.board];
-            board[y][x] = player;
-            let gameData = {
-                board,
-                gameId
-            };
-            this.socket.emit("gameProgress", gameData)
-            this.setState({board, gameStatus: "pending"});
+            if(board[y][x] === 0) {
+                board[y][x] = player;
+                let gameData = {
+                    board,
+                    gameId
+                };
+                this.setState({board, gameStatus: "pending"});
+                this.socket.emit("gameProgress", gameData)
+            }
         }
     };
 

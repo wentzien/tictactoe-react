@@ -7,15 +7,16 @@ class Home extends Component {
     };
 
     handleNewGame = () => {
-        const gameId = this.generateId();
-        this.setState({redirect: `/games/${gameId}`})
+        const gameId = this.generateId(4);
+        const playerId = this.generateId(4);
+        this.setState({redirect: `/games/${gameId}/${playerId}`})
     };
 
-    generateId = () => {
+    generateId = (length = 16) => {
         let result = '';
         const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
         const charactersLength = characters.length;
-        for (let i = 0; i < 8; i++) {
+        for (let i = 0; i < length; i++) {
             result += characters.charAt(Math.floor(Math.random() * charactersLength));
         }
         return result;

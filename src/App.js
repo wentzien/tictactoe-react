@@ -10,7 +10,7 @@ function App() {
     return (
         <div>
             <Switch>
-                <Route exact path="/games/:id" component={Game}/>
+                <Route exact path="/games/:gameId/:playerId" component={Game}/>
                 <Route exact path="/404" component={NotFound}/>
                 <Route exact path="/" component={Home}/>
                 <Route exact path="/*">

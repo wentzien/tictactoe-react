@@ -1,18 +1,37 @@
 import React, {Component} from 'react';
+import io from "socket.io-client";
 import P5 from "../components/p5";
 
 class Game extends Component {
     state = {
         board: [
-            [0, "O", 0],
-            [0, "X", 0],
-            [0, 0, "X"]
+            [0, 0, 0],
+            [0, 0, 0],
+            [0, 0, 0]
         ],
-        gameOver: false,
-        aPlayerSymbol: "X",
-        bPlayerSymbol: "O",
         aScore: 0,
         bScore: 0,
+        gameStatus: "bTurn"
+    };
+
+    socket;
+
+    urlApi = "http://localhost:3001";
+
+    async componentDidMount() {
+
+        this.socket = io(this.urlApi);
+
+        const {gameId, playerId} = this.props.match.params;
+
+        this.socket.emit("join", {gameId, playerId}, (answer) => {
+            console.log(answer);
+        });
+    }
+
+    componentWillUnmount() {
+        this.socket.emit("disconnect");
+        this.socket.off();
     }
 
     sketch = (p5) => {
@@ -62,8 +81,8 @@ class Game extends Component {
             }
 
             p5.clear();
-            drawAllSymbols();
             drawBoard();
+            drawAllSymbols();
         };
     };
 

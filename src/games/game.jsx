@@ -16,6 +16,7 @@ class Game extends Component {
         aScore: 0,
         bScore: 0,
         gameStatus: "pending",
+        lastGameStatus: "pending",
     };
 
     socket;
@@ -35,8 +36,9 @@ class Game extends Component {
         });
 
         this.socket.on("gameData", (gameData) => {
+            const lastGameStatus = this.state.gameStatus;
             const {board, aScore, bScore, gameStatus} = gameData;
-            this.setState({board, aScore, bScore, gameStatus});
+            this.setState({board, aScore, bScore, gameStatus, lastGameStatus});
         });
 
     }
@@ -169,6 +171,12 @@ class Game extends Component {
             <div className="alert alert-light" role="alert">
                 Waiting for other player...
             </div>;
+        const abWaiting =
+            <div className="alert alert-light" role="alert">
+                Other player is waiting for you...
+                <button onClick={this.playAgain} type="button" className="btn btn-link">
+                    Play again</button>
+            </div>;
 
         const {gameStatus, player} = this.state;
 
@@ -180,7 +188,11 @@ class Game extends Component {
             if ((gameStatus === "aTurn" && player === "a") || (gameStatus === "bTurn" && player === "b")) return itsYourTurn;
             else if((gameStatus === "aTurn" && player === "b") || (gameStatus === "bTurn" && player === "a")) return opponentsTurn;
             else if(gameStatus === "pending") return pending;
-            else if(gameStatus === "waiting") return waiting;
+            else if(gameStatus === "aWaiting" && player === "b" || gameStatus === "bWaiting" && player === "a") {
+                return waiting;
+            } else {
+                return abWaiting;
+            }
         }
     };
 
@@ -190,8 +202,8 @@ class Game extends Component {
 
     playAgain = () => {
         // Resets the board
-        const {gameId} = this.state;
-        this.socket.emit("playAgain", gameId);
+        const {gameId, playerId} = this.state;
+        this.socket.emit("playAgain", {gameId, playerId});
     }
 
     render() {

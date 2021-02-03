@@ -1,21 +1,21 @@
 import React, {Component} from 'react';
+import Invite from "./invite";
 
 class Header extends Component {
     render() {
+        const {newSession} = this.props;
         return (
                 <ul className="nav justify-content-center">
                     <li className="nav-item">
-                        <a className="nav-link active" aria-current="page" href="#">Active</a>
+                        <a className="nav-link active" aria-current="page" href="/">Home</a>
                     </li>
                     <li className="nav-item">
-                        <a className="nav-link" href="#">Link</a>
+                        <button className="btn btn-link" onClick={newSession}>
+                            New Session
+                        </button>
                     </li>
                     <li className="nav-item">
-                        <a className="nav-link" href="#">Link</a>
-                    </li>
-                    <li className="nav-item">
-                        <a className="nav-link disabled" href="#" tabIndex="-1"
-                           aria-disabled="true">Disabled</a>
+                        <Invite gameId={this.props.gameId}/>
                     </li>
                 </ul>
         );

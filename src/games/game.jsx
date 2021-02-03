@@ -2,9 +2,12 @@ import React, {Component} from 'react';
 import io from "socket.io-client";
 import P5 from "../components/p5";
 import Header from "../components/header";
+import Gamestatus from "./gamestatus";
+import {Redirect} from "react-router-dom";
 
 class Game extends Component {
     state = {
+        redirect: "",
         player: "",
         playerId: "",
         opponentId: "",
@@ -15,7 +18,7 @@ class Game extends Component {
         ],
         aScore: 0,
         bScore: 0,
-        gameStatus: "pending",
+        gameStatus: "waiting",
         lastGameStatus: "pending",
     };
 
@@ -54,8 +57,8 @@ class Game extends Component {
         const SPACE = 5;
 
         p5.setup = () => {
-            // let size = p5.min(p5.windowHeight - 100, p5.windowWidth - 100);
-            cnv = p5.createCanvas(800, 800);
+            let size = p5.min(p5.windowHeight - 350, p5.windowWidth - 100);
+            cnv = p5.createCanvas(size, size);
             centerCanvas();
 
             xArea = p5.width / 3;
@@ -139,63 +142,6 @@ class Game extends Component {
         }
     }
 
-    gameStatus() {
-        const youWon =
-            <div className="alert alert-success" role="alert">You won
-                <button onClick={this.playAgain} type="button" className="btn btn-link">
-                    Play again</button>
-            </div>;
-        const youLost =
-            <div className="alert alert-danger" role="alert">You lost
-                <button onClick={this.playAgain} type="button" className="btn btn-link">
-                    Play again</button>
-            </div>;
-        const draw =
-            <div className="alert alert-warning" role="alert">Its a draw
-                <button onClick={this.playAgain} type="button" className="btn btn-link">
-                    Play again</button>
-            </div>;
-        const itsYourTurn =
-            <div className="alert alert-primary" role="alert">
-                Its your turn
-            </div>;
-        const opponentsTurn =
-            <div className="alert alert-secondary" role="alert">
-                Opponents turn
-            </div>;
-        const pending =
-            <div className="alert alert-light" role="alert">
-                loading...
-            </div>;
-        const waiting =
-            <div className="alert alert-light" role="alert">
-                Waiting for other player...
-            </div>;
-        const abWaiting =
-            <div className="alert alert-light" role="alert">
-                Other player is waiting for you...
-                <button onClick={this.playAgain} type="button" className="btn btn-link">
-                    Play again</button>
-            </div>;
-
-        const {gameStatus, player} = this.state;
-
-        if (gameStatus === "aWon" || gameStatus === "bWon") {
-            if ((gameStatus === "aWon" && player === "a") || (gameStatus === "bWon" && player === "b")) return youWon;
-            else return youLost;
-        } else if (gameStatus === "draw") return draw
-        else {
-            if ((gameStatus === "aTurn" && player === "a") || (gameStatus === "bTurn" && player === "b")) return itsYourTurn;
-            else if((gameStatus === "aTurn" && player === "b") || (gameStatus === "bTurn" && player === "a")) return opponentsTurn;
-            else if(gameStatus === "pending") return pending;
-            else if(gameStatus === "aWaiting" && player === "b" || gameStatus === "bWaiting" && player === "a") {
-                return waiting;
-            } else {
-                return abWaiting;
-            }
-        }
-    };
-
     gameScore() {
 
     }
@@ -206,14 +152,32 @@ class Game extends Component {
         this.socket.emit("playAgain", {gameId, playerId});
     }
 
+    newSession = () => {
+        console.log("new Session")
+        const gameId = this.generateId(4);
+        const playerId = this.generateId(4);
+        this.setState({redirect: `/games/${gameId}/${playerId}`});
+    }
+
+    generateId = (length = 16) => {
+        let result = '';
+        const characters = 'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789';
+        const charactersLength = characters.length;
+        for (let i = 0; i < length; i++) {
+            result += characters.charAt(Math.floor(Math.random() * charactersLength));
+        }
+        return result;
+    };
+
     render() {
 
-
+        const {gameStatus, player, gameId, redirect} = this.state;
         return (
-            <div>
-                <Header/>
-                {this.gameStatus()}
+            <div className="dimension">
+                <Header gameId={gameId} newSession={this.newSession}/>
+                <Gamestatus gameStatus={gameStatus} player={player} playAgain={this.playAgain}/>
                 <P5 sketch={this.sketch}/>
+                {redirect ? (<Redirect to={redirect}/>) : ''}
             </div>
         );
     }

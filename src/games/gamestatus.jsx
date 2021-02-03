@@ -60,12 +60,20 @@ class Gamestatus extends Component {
     };
 
     render() {
-        const {gameStatus, player} = this.props;
+        const {gameStatus, player, aScore, bScore} = this.props;
+        let yourScore, oScore;
+        if(player === "a") {
+            yourScore = aScore;
+            oScore = bScore;
+        } else {
+            yourScore = bScore;
+            oScore = aScore;
+        }
         console.log(gameStatus, player)
         return (
             <div>
                 <div className="alert alert-light" role="alert" style={{textAlign: "center"}}>
-                    Session Score: 1 : 1
+                    Session Score: {yourScore} (you) - {oScore}
                 </div>
                 {this.gameStatus(gameStatus, player)}
             </div>

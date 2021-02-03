@@ -3,7 +3,6 @@ import io from "socket.io-client";
 import P5 from "../components/p5";
 import Header from "../components/header";
 import Gamestatus from "./gamestatus";
-import {Redirect} from "react-router-dom";
 
 class Game extends Component {
     state = {
@@ -171,13 +170,14 @@ class Game extends Component {
 
     render() {
 
-        const {gameStatus, player, gameId, redirect} = this.state;
+        const {gameStatus, player, gameId, redirect, aScore, bScore} = this.state;
         return (
             <div className="dimension">
                 <Header gameId={gameId} newSession={this.newSession}/>
-                <Gamestatus gameStatus={gameStatus} player={player} playAgain={this.playAgain}/>
+                <Gamestatus gameStatus={gameStatus} player={player} playAgain={this.playAgain} aScore={aScore} bScore={bScore}/>
                 <P5 sketch={this.sketch}/>
-                {redirect ? (<Redirect to={redirect}/>) : ''}
+                {/*{redirect ? (<Redirect to={redirect}/>) : ''}*/}
+                {redirect ? window.location.href=redirect : ''}
             </div>
         );
     }

@@ -23,7 +23,7 @@ class Game extends Component {
 
     socket;
 
-    urlApi = "http://localhost:3001";
+    urlApi = process.env.REACT_APP_API_URL;
 
     async componentDidMount() {
 

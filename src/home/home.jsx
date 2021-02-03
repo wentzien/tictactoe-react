@@ -9,7 +9,7 @@ class Home extends Component {
     handleNewGame = () => {
         const gameId = this.generateId(4);
         const playerId = this.generateId(4);
-        this.setState({redirect: `/games/${gameId}/${playerId}`})
+        this.setState({redirect: `/games/${gameId}/${playerId}`});
     };
 
     generateId = (length = 16) => {

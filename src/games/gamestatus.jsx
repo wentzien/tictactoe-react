@@ -7,17 +7,17 @@ class Gamestatus extends Component {
 
         const youWon =
             <div className="alert alert-success" role="alert">You won
-                <button onClick={playAgain} type="button" className="btn btn-link">
+                <button onClick={playAgain} type="button" className="btn btn-link playAgain">
                     Play again</button>
             </div>;
         const youLost =
             <div className="alert alert-danger" role="alert">You lost
-                <button onClick={playAgain} type="button" className="btn btn-link">
+                <button onClick={playAgain} type="button" className="btn btn-link playAgain">
                     Play again</button>
             </div>;
         const draw =
             <div className="alert alert-warning" role="alert">Its a draw
-                <button onClick={playAgain} type="button" className="btn btn-link">
+                <button onClick={playAgain} type="button" className="btn btn-link playAgain">
                     Play again</button>
             </div>;
         const itsYourTurn =

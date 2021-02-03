@@ -5,6 +5,7 @@
 }
 
 .playAgain {
+  float: right;
   padding: 0;
-  font-size: 24px;
 }
+
